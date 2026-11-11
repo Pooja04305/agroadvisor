@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroAdvisor</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f8f4; margin: 0; padding: 20px; color: #222; }
+  h1 { text-align: center; color: #2e7d32; margin-bottom: 4px; }
+  .container { max-width: 600px; margin: 0 auto; }
+  select, button { width: 100%; padding: 12px; margin: 10px 0; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+  button { background: #2e7d32; color: white; border: none; cursor: pointer; }
+  .tabs { display: flex; gap: 6px; margin: 12px 0; }
+  .tabs button { margin: 0; padding: 10px 4px; font-size: 14px; background: #cfd8cf; color: #222; }
+  .tabs button.active { background: #2e7d32; color: white; }
+  .card { background: white; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .card h3 { margin-top: 0; color: #d84315; }
+  .tip h3 { color: #2e7d32; }
+  .remedy { margin: 8px 0; padding: 10px; border-radius: 6px; }
+  .organic { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+  .chemical { background: #fff3e0; border-left: 4px solid #e65100; }
+  .label { font-weight: bold; }
+  .back-btn { background: #555; margin-bottom: 15px; }
+  .photo-link { display: block; text-align: center; padding: 10px; background: #1565c0; color: white; border-radius: 8px; text-decoration: none; margin-top: 8px; }
+  .disclaimer { background: #fff8e1; border: 1px solid #f9a825; border-radius: 8px; padding: 12px; margin-top: 20px; font-size: 14px; }
+  .error { color: #b71c1c; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="google_translate_element" style="text-align:center"></div>
+  <h1>🌱 AgroAdvisor</h1>
+  <p style="text-align:center;">Pesticide Usage Advisory & Organic Farming Awareness</p>
+
+  <div class="tabs">
+    <button id="tabBtn-advisor" class="active" onclick="showTab('advisor')">🔍 Advisor</button>
+    <button id="tabBtn-organic" onclick="showTab('organic')">🌿 Organic Tips</button>
+    <button id="tabBtn-safety" onclick="showTab('safety')">🛡 Safety</button>
+  </div>
+
+  <div id="tab-advisor">
+    <div id="cropScreen">
+      <label><b>Select your crop:</b></label>
+      <select id="cropSelect"><option value="">-- Choose a crop --</option></select>
+      <button onclick="loadPests()">Show Common Problems</button>
+      <p id="errorMsg" class="error"></p>
+    </div>
+
+    <div id="pestScreen" style="display:none;">
+      <button class="back-btn" onclick="backToCrops()">⬅ Back to Crops</button>
+      <h2 id="cropTitle"></h2>
+      <div id="pestList"></div>
+    </div>
+
+    <div id="remedyScreen" style="display:none;">
+      <button class="back-btn" onclick="backToPests()">⬅ Back to Problems</button>
+      <h2 id="pestTitle"></h2>
+      <div id="remedyList"></div>
+    </div>
+  </div>
+
+  <div id="tab-organic" style="display:none;">
+    <h2>Organic Farming Tips</h2>
+    <div class="card tip"><h3>Build healthy soil</h3>Add compost or well-rotted farmyard manure every season. Healthy soil grows stronger plants that resist pests better.</div>
+    <div class="card tip"><h3>Rotate your crops</h3>Do not grow the same crop, or its relatives, in the same field year after year. Rotation breaks the life cycle of many soil diseases and pests.</div>
+    <div class="card tip"><h3>Use neem</h3>Neem oil (3-5 ml per litre of water with a little mild soap) or neem seed kernel extract (5%) controls many soft-bodied insects. Spray in the evening and cover the underside of leaves.</div>
+    <div class="card tip"><h3>Use traps</h3>Yellow sticky traps catch whitefly and aphids. Blue sticky traps catch thrips. Pheromone traps help you spot borers early.</div>
+    <div class="card tip"><h3>Protect friendly insects</h3>Ladybird beetles, spiders and parasitic wasps eat pests for free. Broad-spectrum sprays kill them too, so spray only when needed.</div>
+    <div class="card tip"><h3>Use bio-agents</h3>Trichoderma and Pseudomonas fluorescens help protect roots and seed from soil diseases. Bt sprays target caterpillars.</div>
+    <div class="card tip"><h3>Grow trap and border crops</h3>Marigold, maize or mustard along field borders can draw pests away from the main crop.</div>
+    <div class="card tip"><h3>Scout your field</h3>Walk through your field every few days and check the underside of leaves. Catching a problem early often means organic methods are enough.</div>
+  </div>
+
+  <div id="tab-safety" style="display:none;">
+    <h2>Pesticide Safety</h2>
+    <div class="card tip"><h3>Before spraying</h3>Read the label and follow the dose exactly. Wear a mask, gloves, full-sleeve clothes and covered shoes. Never spray without protection.</div>
+    <div class="card tip"><h3>When to spray</h3>Spray in the early morning or evening. Do not spray in strong wind, or when rain is expected soon.</div>
+    <div class="card tip"><h3>While spraying</h3>Do not eat, drink or smoke. Spray with the wind behind you, never against it.</div>
+    <div class="card tip"><h3>After spraying</h3>Wash your hands, face and body with soap. Wash the clothes separately. Wait for the number of days on the label before harvesting.</div>
+    <div class="card tip"><h3>Storage and disposal</h3>Keep pesticides in their original container, locked away from children, food and animals. Never reuse empty containers for food or water.</div>
+    <div class="card tip"><h3>If someone feels unwell</h3>Move them to fresh air, remove contaminated clothes, wash the skin with soap and water, and take them to the nearest hospital with the pesticide label.</div>
+  </div>
+
+  <div class="disclaimer">⚠️ This app gives general guidance only. Conditions differ from place to place, so please check with your local agriculture officer or Krishi Vigyan Kendra before spraying any chemical.</div>
+</div>
+
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,hi,kn'}, 'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+let currentCropName = '';
+
+function showTab(name) {
+  ['advisor', 'organic', 'safety'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
+    document.getElementById('tabBtn-' + t).className = (t === name) ? 'active' : '';
+  });
+}
+
+async function loadCrops() {
+  try {
+    const res = await fetch('/api/crops');
+    const crops = await res.json();
+    const select = document.getElementById('cropSelect');
+    crops.forEach(crop => {
+      const opt = document.createElement('option');
+      opt.value = crop.id;
+      opt.textContent = crop.name;
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    document.getElementById('errorMsg').textContent = 'Could not load crops. Please check your connection and try again.';
+  }
+}
+
+async function loadPests() {
+  const select = document.getElementById('cropSelect');
+  const cropId = select.value;
+  if (!cropId) { alert('Please select a crop first.'); return; }
+  currentCropName = select.options[select.selectedIndex].text;
+
+  const res = await fetch('/api/crops/' + cropId + '/pests');
+  const pests = await res.json();
+
+  document.getElementById('cropTitle').textContent = currentCropName + ' - Common Problems';
+  const list = document.getElementById('pestList');
+  list.innerHTML = '';
+  pests.forEach(pest => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    const h3 = document.createElement('h3');
+    h3.textContent = pest.name;
+    const btn = document.createElement('button');
+    btn.textContent = 'View Remedies';
+    btn.onclick = () => loadRemedies(pest.id, pest.name);
+    const photo = document.createElement('a');
+    photo.className = 'photo-link';
+    photo.target = '_blank';
+    photo.textContent = '📷 See photos';
+    photo.href = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(currentCropName + ' ' + pest.name + ' symptoms');
+    div.appendChild(h3);
+    div.appendChild(btn);
+    div.appendChild(photo);
+    list.appendChild(div);
+  });
+
+  document.getElementById('cropScreen').style.display = 'none';
+  document.getElementById('pestScreen').style.display = 'block';
+  document.getElementById('remedyScreen').style.display = 'none';
+}
+
+async function loadRemedies(pestId, pestName) {
+  const res = await fetch('/api/pests/' + pestId + '/remedies');
+  const remedies = await res.json();
+
+  document.getElementById('pestTitle').textContent = pestName;
+  const list = document.getElementById('remedyList');
+  list.innerHTML = '';
+  remedies.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'remedy ' + r.type;
+    const label = r.type === 'organic' ? '🌿 Organic (Try First)' : '⚠️ Chemical (Last Resort)';
+    div.innerHTML = '<div class="label">' + label + '</div><div>' + r.description + '</div>';
+    list.appendChild(div);
+  });
+
+  document.getElementById('pestScreen').style.display = 'none';
+  document.getElementById('remedyScreen').style.display = 'block';
+}
+
+function backToCrops() {
+  document.getElementById('cropScreen').style.display = 'block';
+  document.getElementById('pestScreen').style.display = 'none';
+  document.getElementById('remedyScreen').style.display = 'none';
+}
+
+function backToPests() {
+  document.getElementById('pestScreen').style.display = 'block';
+  document.getElementById('remedyScreen').style.display = 'none';
+}
+
+loadCrops();
+</script>
+</body>
+</html>
